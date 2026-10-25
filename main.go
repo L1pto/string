@@ -1,13 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"myproject/toolkit"
 )
-
-func printResult(name string, src, result []int) {
-	fmt.Printf("%-10s src=%v result=%v\n", name, src, result)
-}
 
 func main() {
 
