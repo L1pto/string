@@ -71,10 +71,6 @@ func TopN(freq map[string]int, n int) []WordCount {
 		result = append(result, WordCount{Word: word, Count: count})
 	}
 
-	if n >= len(freq) {
-		return result
-	}
-
 	sort.Slice(result, func(i, j int) bool {
 		if result[i].Count != result[j].Count {
 			return result[i].Count > result[j].Count

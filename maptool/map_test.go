@@ -312,26 +312,26 @@ func TestTopN(t *testing.T) {
 		}
 	})
 
-	t.Run("tie-break mixed counts", func(t *testing.T) {
-		// Count: x=1, y=1, z=2, w=2, v=3
-		// Ожидаемый порядок: v(3), w(2), z(2), x(1), y(1)
+	t.Run("tie-break mixed counts full", func(t *testing.T) {
 		freq := map[string]int{"x": 1, "y": 1, "z": 2, "w": 2, "v": 3}
-		got := TopN(freq, 4)
+		got := TopN(freq, 5) // n == len(freq) → все элементы
 		want := []WordCount{
 			{Word: "v", Count: 3},
 			{Word: "w", Count: 2},
 			{Word: "z", Count: 2},
 			{Word: "x", Count: 1},
+			{Word: "y", Count: 1},
 		}
 		if !equalCounts(got, want) {
-			t.Fatalf("TopN(%v, 4) = %#v, want %#v", freq, got, want)
+			t.Fatalf("TopN(%v, 5) = %#v, want %#v", freq, got, want)
 		}
 	})
 
 	t.Run("n > len(freq)", func(t *testing.T) {
 		freq := map[string]int{"a": 1, "b": 2}
 		got := TopN(freq, 10)
-		want := []WordCount{{Word: "a", Count: 1}, {Word: "b", Count: 2}}
+		// n больше размера map → возвращаются ВСЕ элементы
+		want := []WordCount{{Word: "b", Count: 2}, {Word: "a", Count: 1}}
 		if !equalCounts(got, want) {
 			t.Fatalf("TopN(%v, 10) = %#v, want %#v", freq, got, want)
 		}
@@ -340,16 +340,14 @@ func TestTopN(t *testing.T) {
 	t.Run("n == len(freq)", func(t *testing.T) {
 		freq := map[string]int{"a": 1, "b": 2, "c": 3}
 		got := TopN(freq, 3)
-		// Порядок не гарантирован (sort не вызывается), поэтому сравниваем как множества
-		if len(got) != 3 {
-			t.Fatalf("expected 3 items, got %d: %#v", len(got), got)
+		// n == len(freq) → возвращаются все элементы отсортированные
+		want := []WordCount{
+			{Word: "c", Count: 3},
+			{Word: "b", Count: 2},
+			{Word: "a", Count: 1},
 		}
-		seen := map[string]int{}
-		for _, wc := range got {
-			seen[wc.Word] = wc.Count
-		}
-		if !reflect.DeepEqual(seen, freq) {
-			t.Fatalf("TopN(%v, 3) returned mismatched set: %#v", freq, got)
+		if !equalCounts(got, want) {
+			t.Fatalf("TopN(%v, 3) = %#v, want %#v", freq, got, want)
 		}
 	})
 

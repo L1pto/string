@@ -18,20 +18,21 @@ func RunNumbersDemo() {
 }
 
 func RunTextDemo(text string) {
-	// 1. очистка и нормализация
-	clean := stringtools.CleanNonLetters(stringtools.ToLower(text))
-	fmt.Println("clean:", clean)
+	// 1. Разбиваем исходный текст на слова
+	rawWords := stringtools.SplitWords(stringtools.ToLower(text))
 
-	// 2. разбиение на слова — тут нужен SplitWords, см. ниже
-	words := stringtools.SplitWords(clean)
-	fmt.Println("words:", words)
+	// 2. Нормализуем каждый токен: оставляем только буквы
+	words := make([]string, 0, len(rawWords))
+	for _, w := range rawWords {
+		cleaned := stringtools.CleanNonLetters(w)
+		if cleaned != "" {
+			words = append(words, cleaned)
+		}
+	}
 
-	// 3. частота
 	freq := maptools.Frequency(words)
+	top := maptools.TopN(freq, 3)
 	fmt.Println("freq:", freq)
-
-	// 4. топ-3 частых слов (через slicetools)
-	top := maptools.TopN(freq, 3) // использует slicetools.Filter / sort
 	fmt.Println("top-3:", top)
 }
 
